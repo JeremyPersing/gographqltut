@@ -1,0 +1,16 @@
+after making additions or subtractions from schema.graphql
+go run github.com/99designs/gqlgen generate
+
+godotenv for credentials and secrets
+
+go get github.com/matoous/go-nanoid/v2
+
+set up dependecy injection on server
+
+access imports by the package name aka folder name or you can
+rename imports like
+import (
+    something "github.com/.../.../v2"
+)
+
+something.GetCrayon()
