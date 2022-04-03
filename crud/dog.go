@@ -4,6 +4,7 @@ import (
 	"github.com/JeremyPersing/gographqltut/graph/model"
 	gonanoid "github.com/matoous/go-nanoid/v2"
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 )
 
 func InsertDog(db *gorm.DB, name string, isGoodBoi bool) (*model.Dog, error) {
@@ -31,4 +32,30 @@ func GetAllDogs(db *gorm.DB) ([]*model.Dog, error) {
 	res := db.Find(&dogs)
 
 	return dogs, res.Error
+}
+
+func UpdateDogName(db *gorm.DB, id string, name string) (*model.Dog, error) {
+	var dog model.Dog
+
+	res := db.
+		Model(&dog).
+		// Model(&model.Dog{}). this works but returns empty data, w/out above Model called
+		Clauses(clause.Returning{Columns: []clause.Column{}}).
+		Where("id = ?", id).
+		Update("name", name)
+
+	return &dog, res.Error
+}
+
+func DeleteDog(db *gorm.DB, id string) (bool, error) {
+	deleted := true
+
+	res := db.Delete(&model.Dog{}, "id = ?", id)
+
+	if res.Error != nil {
+		deleted = false
+		panic("Error deleting dog")
+	}
+
+	return deleted, res.Error
 }

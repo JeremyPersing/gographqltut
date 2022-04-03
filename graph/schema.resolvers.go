@@ -9,7 +9,6 @@ import (
 	"github.com/JeremyPersing/gographqltut/crud"
 	"github.com/JeremyPersing/gographqltut/graph/generated"
 	"github.com/JeremyPersing/gographqltut/graph/model"
-	"gorm.io/gorm/clause"
 )
 
 func (r *mutationResolver) CreateDog(ctx context.Context, input model.NewDog) (*model.Dog, error) {
@@ -17,29 +16,11 @@ func (r *mutationResolver) CreateDog(ctx context.Context, input model.NewDog) (*
 }
 
 func (r *mutationResolver) UpdateDogName(ctx context.Context, id string, name string) (*model.Dog, error) {
-	var dog model.Dog
-
-	res := r.DB.
-		Model(&dog).
-		// Model(&model.Dog{}). this works but returns empty data, w/out above Model called
-		Clauses(clause.Returning{Columns: []clause.Column{}}).
-		Where("id = ?", id).
-		Update("name", name)
-
-	return &dog, res.Error
+	return crud.UpdateDogName(r.DB, id, name)
 }
 
 func (r *mutationResolver) DeleteDog(ctx context.Context, id string) (bool, error) {
-	deleted := true
-
-	res := r.DB.Delete(&model.Dog{}, "id = ?", id)
-
-	if res.Error != nil {
-		deleted = false
-		panic("Error deleting dog")
-	}
-
-	return deleted, res.Error
+	return crud.DeleteDog(r.DB, id)
 }
 
 func (r *queryResolver) Dog(ctx context.Context, id string) (*model.Dog, error) {
